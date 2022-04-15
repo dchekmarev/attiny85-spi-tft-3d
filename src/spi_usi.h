@@ -18,24 +18,27 @@ void spi_init() {
 void transfer(uint8_t dat) {
   USIDR = dat;
 
-// cycle millis: 1270, fps: 0.79 -> cycle millis: 420, fps: 2.38
+// cycle millis: 420, fps: 2.38 -> cycle millis: 285, fps: 3.51
 
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
-  USICR |= _BV(USITC);
+  uint8_t CLK_LOW = (1 << USIWM0) | (1 << USICS1) | (1 << USITC);
+  uint8_t CLK_HIGH = (1 << USIWM0) | (1 << USICS1) | (1 << USITC) | (1 << USICLK);
+
+  USICR = CLK_LOW;
+  USICR = CLK_HIGH;
+  USICR = CLK_LOW;
+  USICR = CLK_HIGH;
+  USICR = CLK_LOW;
+  USICR = CLK_HIGH;
+  USICR = CLK_LOW;
+  USICR = CLK_HIGH;
+  USICR = CLK_LOW;
+  USICR = CLK_HIGH;
+  USICR = CLK_LOW;
+  USICR = CLK_HIGH;
+  USICR = CLK_LOW;
+  USICR = CLK_HIGH;
+  USICR = CLK_LOW;
+  USICR = CLK_HIGH;
 }
 
 void command(uint8_t c) {
