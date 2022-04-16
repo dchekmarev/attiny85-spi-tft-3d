@@ -14,7 +14,6 @@ static const int8_t orig_points[NPOINTS][3] = {  // eight 3D points - set values
     {1, 1, -1},
     {-1, 1, -1}};
 
-float rotated_3d_points[NPOINTS][3];  // eight 3D points - rotated around Y axis
 uint16_t angle_deg_0 = 60;         // rotation around the Y axis
 uint16_t angle_deg_1 = 60;         // rotation around the X axis
 uint16_t angle_deg_2 = 60;         // rotation around the Z axis
@@ -24,7 +23,7 @@ float time_frame;               // ever increasing time value
 /**
  * rotate points around given axis by given degree
  */
-void rotate(uint16_t angle_deg, uint8_t axis0) {
+void rotate(uint16_t angle_deg, uint8_t axis0, float rotated_3d_points[NPOINTS][3]) {
   uint8_t axis1 = axis0 == 1 ? 0 : 1;
   uint8_t axis2 = axis0 == 2 ? 0 : 2;
   float rads = radians(angle_deg);
@@ -54,6 +53,8 @@ void cube_calculate() {
   angle_deg_0 = angle_deg_1 = angle_deg_2 = 0;
 #endif
 
+  float rotated_3d_points[NPOINTS][3];  // eight 3D points - rotated around Y axis
+
   // init points
   for (uint8_t i = 0; i < NPOINTS; i++) {
     rotated_3d_points[i][0] = orig_points[i][0];
@@ -62,9 +63,9 @@ void cube_calculate() {
   }
 
   // rotate to current position
-  rotate(angle_deg_0, 0);
-  rotate(angle_deg_1, 1);
-  rotate(angle_deg_2, 2);
+  rotate(angle_deg_0, 0, rotated_3d_points);
+  rotate(angle_deg_1, 1, rotated_3d_points);
+  rotate(angle_deg_2, 2, rotated_3d_points);
 
   // calculate the points
   for (uint8_t i = 0; i < NPOINTS; i++) {
