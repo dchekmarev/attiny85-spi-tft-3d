@@ -1,9 +1,6 @@
 #define OUT_REG PORTB
 #define IN_REG PINB
 
-#define DC_HIGH (OUT_REG |= (1 << TFT_DC))
-#define DC_LOW (OUT_REG &= ~(1 << TFT_DC))
-
 #define OUT_HIGH(reg) (OUT_REG |= (1 << reg))
 #define OUT_LOW(reg) (OUT_REG &= ~(1 << reg))
 
@@ -26,14 +23,4 @@ void transfer(uint8_t dat) {
   }
   return true;
 
-}
-
-void command(uint8_t c) {
-  DC_LOW;
-  transfer(c);
-}
-
-void data(uint8_t c) {
-  DC_HIGH;
-  transfer(c);
 }

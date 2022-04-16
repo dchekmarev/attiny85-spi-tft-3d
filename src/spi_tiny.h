@@ -9,13 +9,3 @@ void spi_init() {
 void transfer(uint8_t dat) {
   SPI.transfer(dat);
 }
-
-void command(uint8_t c) {
-  digitalWrite(TFT_DC, LOW);
-  transfer(c);
-}
-
-void data(uint8_t c) {
-  digitalWrite(TFT_DC, HIGH);
-  transfer(c);
-}

@@ -1,13 +1,3 @@
-#include <Arduino.h>
-
-#define SERIAL_ENABLED 1
-#if SERIAL_ENABLED == 1
-#include <SoftwareSerial.h>
-#define rxPin 5    // We use a non-existant pin as we are not interested in receiving data
-#define txPin PB4
-SoftwareSerial serial(rxPin, txPin);
-#endif
-
 /**
  * IN PROGRESS, NOTHING WORKS HERE YET
  *
@@ -18,12 +8,24 @@ SoftwareSerial serial(rxPin, txPin);
 
 #include <Arduino.h>
 
+// #define DEBUG_ENABLED 1
+// #define SERIAL_ENABLED 1
+
+#if SERIAL_ENABLED == 1
+#include <SoftwareSerial.h>
+#define rxPin 5    // We use a non-existant pin as we are not interested in receiving data
+#define txPin PB4
+SoftwareSerial serial(rxPin, txPin);
+#define Debug serial
+#endif
+
 #define SCREEN_WIDTH 240
 #define SCREEN_HEIGHT 320
 
-// #define DEBUG_ENABLED
-#ifdef DEBUG_ENABLED
+#if DEBUG_ENABLED == 1
+#if SERIAL_ENABLED != 1
 #include <TinyDebug.h>
+#endif
 #endif
 
 #define TFT_DC   PB3
@@ -64,7 +66,11 @@ static const uint8_t init_commands[] =
     0
 };
 
+#include "gfx.h"
+
 void tft_init() {
+  pinMode(TFT_DC, OUTPUT);
+
   for (uint8_t i = 0; i < sizeof(init_commands); ++i) {
     uint8_t cmd_size = init_commands[i];
     command(init_commands[++i]);
@@ -87,16 +93,17 @@ void tft_init() {
   delay(120);
 }
 
-#include "gfx.h"
-
 void setup() {
   pinMode(PB4, OUTPUT);
+  pinMode(TFT_DC, OUTPUT);
+  digitalWrite(TFT_DC, HIGH);
 #if SERIAL_ENABLED == 1
   serial.begin(9600);
-  serial.println(F("starting"));
 #endif
-#ifdef DEBUG_ENABLED
+#if (DEBUG_ENABLED == 1) && (SERIAL_ENABLED != 1)
   Debug.begin();
+#endif
+#if (DEBUG_ENABLED == 1) || (SERIAL_ENABLED == 1)
   Debug.println(F("starting"));
 #endif
   spi_init();
@@ -105,16 +112,13 @@ void setup() {
 
   fillRect(0, 0, 240, 320, 0);
 
-#ifdef DEBUG_ENABLED
+#if (DEBUG_ENABLED == 1) || (SERIAL_ENABLED == 1)
   Debug.println(F("started"));
-#endif
-#if SERIAL_ENABLED == 1
-  serial.println(F("started"));
 #endif
 }
 
-#define BOX_WIDTH 50
-#define BOX_HEIGHT 50
+#define BOX_WIDTH 128
+#define BOX_HEIGHT 128
 
 uint16_t x = 0, y = 0;
 int8_t dx = 5, dy = 3;
@@ -132,7 +136,7 @@ const uint16_t colors[] = {
 uint32_t totalTimeSum = 0;
 uint16_t count = 0;
 
-void loop() {
+void fillScreenLoop() {
   uint32_t loopStart = millis();
 
   c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
@@ -153,15 +157,11 @@ void loop() {
   }
 }
 
-
 unsigned long lastColorChange;
-void loop2() {
+
+void floatingBoxLoop() {
   uint32_t loopStart = millis();
 
-  if (millis() - lastColorChange > 5000) {
-    c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
-    lastColorChange = millis();
-  }
   if ( (x + dx < 0) || (x + dx > SCREEN_WIDTH - BOX_WIDTH) ) {
     dx = -dx;
   }
@@ -172,7 +172,6 @@ void loop2() {
   clearRect(x, y, BOX_WIDTH, dy);
   clearRect(x + BOX_WIDTH + dx, y, -dx, BOX_HEIGHT);
   clearRect(x, y + BOX_HEIGHT + dy, BOX_WIDTH, -dy);
-  // fillRect(x, y, BOX_WIDTH, BOX_HEIGHT, 0);
   x += dx;
   y += dy;
 
@@ -191,4 +190,55 @@ void loop2() {
     count = 0;
     totalTimeSum = 0;
   }
+}
+
+#include "cube.h"
+
+void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
+  drawLine(points[i][0] + x, points[i][1] + y, points[j][0] + x, points[j][1] + y);
+}
+
+void drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
+  fillRect(x, y, w, 1, color);
+  fillRect(x, y, 1, h, color);
+  fillRect(x + w - 1, y, 1, h, color);
+  fillRect(x, y + h - 1, w, 1, color);
+}
+
+void loop() {
+  if (millis() - lastColorChange > 5000) {
+    c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
+    lastColorChange = millis();
+  }
+
+  drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
+  // boxes at corners
+  #define CORNER_BOX_SIZE 10
+  fillRect(0, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
+  fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
+  fillRect(0, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
+  fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
+
+  if ( (x + dx < 0) || ((x + dx) > (SCREEN_WIDTH - CUBE_SIZE)) ) {
+    dx = -dx;
+  }
+  if ( (y + dy < 0) || ((y + dy) > (SCREEN_HEIGHT - CUBE_SIZE)) ) {
+    dy = -dy;
+  }
+
+  color = 0;
+  cube_render();
+
+  x += dx;
+  y += dy;
+
+  cube_calculate();
+
+  color = colors[c];
+  cube_render();
+
+  delay(30);
+
+  // fillScreenLoop();
+  // floatingBoxLoop();
 }
