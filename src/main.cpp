@@ -172,9 +172,9 @@ void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
 }
 
 void cubeLoop() {
-  if (millis() - lastColorChange > 5000) {
+  if (millis() > lastColorChange) {
     c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
-    lastColorChange = millis();
+    lastColorChange = millis() + 5000;
 
     drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
     // boxes at corners
@@ -196,8 +196,13 @@ void cubeLoop() {
     dy = -dy;
   }
 
+  uint16_t old_points[NPOINTS][2];
+  memmove(old_points, points, sizeof(uint16_t) * NPOINTS * 2);
+
+  cube_calculate();
+
   color = 0;
-  cube_render();
+  cube_render(old_points);
 
   x += dx;
   y += dy;
@@ -205,10 +210,8 @@ void cubeLoop() {
   x = y = 0;
 #endif
 
-  cube_calculate();
-
   color = colors[c];
-  cube_render();
+  cube_render(points);
 
   delay(10);
 

@@ -26,9 +26,8 @@ float time_frame;               // ever increasing time value
 void rotate(uint16_t angle_deg, uint8_t axis0, float rotated_3d_points[NPOINTS][3]) {
   uint8_t axis1 = axis0 == 1 ? 0 : 1;
   uint8_t axis2 = axis0 == 2 ? 0 : 2;
-  float rads = radians(angle_deg);
-  float cos_val = cos(rads);
-  float sin_val = sin(rads);
+  float cos_val = cos(radians(angle_deg));
+  float sin_val = sin(radians(angle_deg));
 
   // rotate 3d points in given 2-axis projection
   for (uint8_t i = 0; i < NPOINTS; i++) {
@@ -41,10 +40,9 @@ void rotate(uint16_t angle_deg, uint8_t axis0, float rotated_3d_points[NPOINTS][
   }
 }
 
-void cube_calculate() {
+void cube_update() {
   time_frame++;
 
-  uint16_t cube_size = (CUBE_SIZE - 15 - 1) + sin(time_frame * 0.2) * 15;
   angle_deg_0 = (angle_deg_0 + 3) % 360;
   angle_deg_1 = (angle_deg_1 + 5) % 360;
   angle_deg_2 = (angle_deg_2 + 7) % 360;
@@ -52,6 +50,11 @@ void cube_calculate() {
 #if DEBUG_ENABLED == 1
   angle_deg_0 = angle_deg_1 = angle_deg_2 = 0;
 #endif
+}
+
+void cube_calculate() {
+  cube_update();
+  uint16_t cube_size = (CUBE_SIZE - 15 - 1) + sin(time_frame * 0.2) * 15;
 
   float rotated_3d_points[NPOINTS][3];  // eight 3D points - rotated around Y axis
 
@@ -77,7 +80,7 @@ void cube_calculate() {
 
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 
-void cube_render() {
+void cube_render(uint16_t points[][2]) {
     // connect the lines between the individual points
     for (uint8_t i = 0; i < 4; i++) {
       connectPoints(i, (i + 1) % 4, points);
