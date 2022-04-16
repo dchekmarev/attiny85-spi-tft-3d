@@ -1,9 +1,9 @@
 #include "gpu_io.h"
 
 #define rgb_565(r, g, b) ( \
-  ((r & ((1 << 6) - 1)) << 11) | \
-    ((g & ((1 << 7) - 1)) << 6) | \
-    (b & ((1 << 6) - 1)) )
+  ((uint16_t) (r & ((1 << 6) - 1)) << 11) | \
+    ((uint16_t) (g & ((1 << 7) - 1)) << 6) | \
+    ((uint16_t) b & ((1 << 6) - 1)) )
 
 void clearRect(uint16_t x, uint16_t y, int16_t w, int16_t h) {
   if (w > 0 && h > 0) {
@@ -36,15 +36,14 @@ void _drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
     // non-vertical
     float step_x, step_y, x = x1, y = y1;
 
-    float a = 1.0 * dy / dx;
-    if (abs(a) <= 1) {
+    if (abs(dy) <= abs(dx)) {
       // it's more horizontal, draw with hLines
-      step_x = 1.0 * dx / abs(dy);
-      step_y = 1.0 * dy / abs(dy);
+      step_x = (float) dx / abs(dy);
+      step_y = (float) dy / abs(dy);
     } else {
       // it's more vertical, draw with vLines
-      step_x = 1.0 * dx / abs(dx);
-      step_y = 1.0 * dy / abs(dx);
+      step_x = (float) dx / abs(dx);
+      step_y = (float) dy / abs(dx);
     }
 
     while (round(x) != x2 || round(y) != y2) {

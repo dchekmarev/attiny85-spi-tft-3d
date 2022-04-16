@@ -58,12 +58,12 @@ void fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t c) {
   h = min(h, SCREEN_HEIGHT - y);
   setAddrAndRW_cont(x, y, x + w - 1, y + h - 1);
   uint8_t hi = c >> 8, lo = c & 0xFF;
-  digitalWrite(TFT_DC, HIGH);
-  for (int x = 0; x < w; ++x) {
-    for (int y = 0; y < h; ++y) {
+  DC_HIGH;
+  for (uint16_t x = w; x; --x) {
+    for (uint16_t y = h; y; --y) {
       transfer(hi);
       transfer(lo);
     }
   }
-  digitalWrite(TFT_DC, LOW);
+  DC_LOW;
 }

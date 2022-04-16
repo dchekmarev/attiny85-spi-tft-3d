@@ -126,7 +126,7 @@ uint16_t x = 0, y = 0;
 int8_t dx = 5, dy = 3;
 uint8_t c = 0;
 
-const uint16_t colors[] = {
+static const uint16_t colors[] = {
   rgb_565(0xff, 0x00, 0x00),
   rgb_565(0x00, 0xff, 0x00),
   rgb_565(0x00, 0x00, 0xff),
@@ -175,19 +175,19 @@ void cubeLoop() {
   if (millis() - lastColorChange > 5000) {
     c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
     lastColorChange = millis();
+
+    drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
+    // boxes at corners
+    #define CORNER_BOX_SIZE 10
+    fillRect(0, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
+    fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
+    fillRect(0, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
+    fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
   }
 
 #if DEBUG_ENABLED == 1
   c = 1;
 #endif
-
-  drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
-  // boxes at corners
-  #define CORNER_BOX_SIZE 10
-  fillRect(0, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
-  fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
-  fillRect(0, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
-  fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
 
   if ( (x + dx < 0) || ((x + dx) > (SCREEN_WIDTH - CUBE_SIZE)) ) {
     dx = -dx;
@@ -219,11 +219,10 @@ void loop() {
   uint32_t loopStart = millis();
 
   cubeLoop();
-
   // fillScreenLoop();
   // floatingBoxLoop();
 
-#ifdef SERIAL_ENABLED == 1
+#if SERIAL_ENABLED == 1
   totalTimeSum += millis() - loopStart;
   count++;
 
@@ -232,7 +231,7 @@ void loop() {
     Serial.print(F("cycle millis: "));
     Serial.print(millisPerCycle);
     Serial.print(F(", fps: "));
-    Serial.println(1 / (0.001 * totalTimeSum / count));
+    Serial.println(1000 * count / totalTimeSum);
     count = totalTimeSum = 0;
   }
 #endif
