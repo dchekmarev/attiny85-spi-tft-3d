@@ -17,6 +17,7 @@
 #define txPin PB4
 SoftwareSerial serial(rxPin, txPin);
 #define Debug serial
+#define Serial serial // redefine serial to be software implementation
 #endif
 
 #define SCREEN_WIDTH 240
@@ -25,6 +26,7 @@ SoftwareSerial serial(rxPin, txPin);
 #if DEBUG_ENABLED == 1
 #if SERIAL_ENABLED != 1
 #include <TinyDebug.h>
+#define Serial Debug
 #endif
 #endif
 
@@ -98,13 +100,13 @@ void setup() {
   pinMode(TFT_DC, OUTPUT);
   digitalWrite(TFT_DC, HIGH);
 #if SERIAL_ENABLED == 1
-  serial.begin(9600);
+  Serial.begin(9600);
 #endif
 #if (DEBUG_ENABLED == 1) && (SERIAL_ENABLED != 1)
-  Debug.begin();
+  Serial.begin();
 #endif
 #if (DEBUG_ENABLED == 1) || (SERIAL_ENABLED == 1)
-  Debug.println(F("starting"));
+  Serial.println(F("starting"));
 #endif
   spi_init();
 
@@ -113,7 +115,7 @@ void setup() {
   fillRect(0, 0, 240, 320, 0);
 
 #if (DEBUG_ENABLED == 1) || (SERIAL_ENABLED == 1)
-  Debug.println(F("started"));
+  Serial.println(F("started"));
 #endif
 }
 
@@ -137,30 +139,14 @@ uint32_t totalTimeSum = 0;
 uint16_t count = 0;
 
 void fillScreenLoop() {
-  uint32_t loopStart = millis();
 
   c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
   fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
-
-  totalTimeSum += millis() - loopStart;
-  count++;
-  if (totalTimeSum > 5000 || count > 100) { // print stats every ~5000ms
-    uint32_t millisPerCycle = totalTimeSum / count;
-#if SERIAL_ENABLED == 1
-    serial.print(F("cycle millis: "));
-    serial.print(millisPerCycle);
-    serial.print(F(", fps: "));
-    serial.println(1 / (0.001 * totalTimeSum / count));
-#endif
-    count = 0;
-    totalTimeSum = 0;
-  }
 }
 
 unsigned long lastColorChange;
 
 void floatingBoxLoop() {
-  uint32_t loopStart = millis();
 
   if ( (x + dx < 0) || (x + dx > SCREEN_WIDTH - BOX_WIDTH) ) {
     dx = -dx;
@@ -177,32 +163,12 @@ void floatingBoxLoop() {
 
   fillRect(x, y, BOX_WIDTH, BOX_HEIGHT, colors[c]);
 
-  totalTimeSum += millis() - loopStart;
-  count++;
-  if (totalTimeSum > 5000 || count > 100) { // print stats every ~5000ms
-    uint32_t millisPerCycle = totalTimeSum / count;
-#if SERIAL_ENABLED == 1
-    serial.print(F("cycle millis: "));
-    serial.print(millisPerCycle);
-    serial.print(F(", fps: "));
-    serial.println(1 / (0.001 * totalTimeSum / count));
-#endif
-    count = 0;
-    totalTimeSum = 0;
-  }
 }
 
 #include "cube.h"
 
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
   drawLine(points[i][0] + x, points[i][1] + y, points[j][0] + x, points[j][1] + y);
-}
-
-void drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
-  fillRect(x, y, w, 1, color);
-  fillRect(x, y, 1, h, color);
-  fillRect(x + w - 1, y, 1, h, color);
-  fillRect(x, y + h - 1, w, 1, color);
 }
 
 void cubeLoop() {
@@ -249,38 +215,26 @@ void cubeLoop() {
 }
 
 void loop() {
+
+  uint32_t loopStart = millis();
+
   cubeLoop();
-  return;
-
-fillRect(14, 232, 1, 13, 65535);
-fillRect(15, 245, 1, 13, 65535);
-fillRect(20, 232, 10, 100, 0xfff);
-delay(100000);
-return;
-    color = 0xffff;
-    drawLine(0, 50, SCREEN_WIDTH - 1, 0);
-    drawLine(0, 50, 20, SCREEN_HEIGHT - 1);
-    delay(20000);
-  // for (uint16_t c = 0; c < SCREEN_HEIGHT; c++) {
-  //   color = 0xffff;
-  //   drawLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH - 1, c);
-  //   delay(20);
-  //   color = 0;
-  //   drawLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH - 1, c);
-  // }
-
-  // for (int c = 0; c < 64; c++) {
-  //   drawLine(127, 32, 0, c);
-  // }
-
-  // for (int c = 0; c < 128; c++) {
-  //   drawLine(63, 0, c, 63);
-  // }
-
-  // for (int c = 0; c < 128; c++) {
-  //   drawLine(63, 63, c, 0);
-  // }
 
   // fillScreenLoop();
   // floatingBoxLoop();
+
+#ifdef SERIAL_ENABLED == 1
+  totalTimeSum += millis() - loopStart;
+  count++;
+
+  if (totalTimeSum > 5000 || count > 500) { // print stats every ~5000ms
+    uint32_t millisPerCycle = totalTimeSum / count;
+    Serial.print(F("cycle millis: "));
+    Serial.print(millisPerCycle);
+    Serial.print(F(", fps: "));
+    Serial.println(1 / (0.001 * totalTimeSum / count));
+    count = totalTimeSum = 0;
+  }
+#endif
+
 }

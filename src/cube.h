@@ -4,7 +4,7 @@
 
 uint16_t points[NPOINTS][2];  // eight 2D points for the cube, values will be calculated in the code
 
-int8_t const orig_points[NPOINTS][3] = {  // eight 3D points - set values for 3D cube
+static const int8_t orig_points[NPOINTS][3] = {  // eight 3D points - set values for 3D cube
     {-1, -1, 1},
     {1, -1, 1},
     {1, 1, 1},
