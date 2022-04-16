@@ -205,11 +205,15 @@ void drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
   fillRect(x, y + h - 1, w, 1, color);
 }
 
-void loop() {
+void cubeLoop() {
   if (millis() - lastColorChange > 5000) {
     c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
     lastColorChange = millis();
   }
+
+#if DEBUG_ENABLED == 1
+  c = 1;
+#endif
 
   drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
   // boxes at corners
@@ -231,13 +235,51 @@ void loop() {
 
   x += dx;
   y += dy;
+#if DEBUG_ENABLED == 1
+  x = y = 0;
+#endif
 
   cube_calculate();
 
   color = colors[c];
   cube_render();
 
-  delay(30);
+  delay(10);
+
+}
+
+void loop() {
+  cubeLoop();
+  return;
+
+fillRect(14, 232, 1, 13, 65535);
+fillRect(15, 245, 1, 13, 65535);
+fillRect(20, 232, 10, 100, 0xfff);
+delay(100000);
+return;
+    color = 0xffff;
+    drawLine(0, 50, SCREEN_WIDTH - 1, 0);
+    drawLine(0, 50, 20, SCREEN_HEIGHT - 1);
+    delay(20000);
+  // for (uint16_t c = 0; c < SCREEN_HEIGHT; c++) {
+  //   color = 0xffff;
+  //   drawLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH - 1, c);
+  //   delay(20);
+  //   color = 0;
+  //   drawLine(0, SCREEN_HEIGHT / 2, SCREEN_WIDTH - 1, c);
+  // }
+
+  // for (int c = 0; c < 64; c++) {
+  //   drawLine(127, 32, 0, c);
+  // }
+
+  // for (int c = 0; c < 128; c++) {
+  //   drawLine(63, 0, c, 63);
+  // }
+
+  // for (int c = 0; c < 128; c++) {
+  //   drawLine(63, 63, c, 0);
+  // }
 
   // fillScreenLoop();
   // floatingBoxLoop();
