@@ -170,9 +170,10 @@ void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
 }
 
 void cubeLoop() {
-  if (millis() > lastColorChange) {
+  unsigned long nowMillis = millis();
+  if (nowMillis > lastColorChange) {
     c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
-    lastColorChange = millis() + 5000;
+    lastColorChange = nowMillis + 5000;
 
     drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
     // boxes at corners
@@ -217,7 +218,9 @@ void cubeLoop() {
 
 void loop() {
 
+#if SERIAL_ENABLED == 1
   uint32_t loopStart = millis();
+#endif
 
   cubeLoop();
   // fillScreenLoop();
