@@ -15,7 +15,7 @@ uint16_t color = 0;
 
 #define diff(a, b) (max(a, b) - min(a, b))
 
-void _drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
+void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
 #if DEBUG_ENABLED == 1
   Debug.print(F("_drawLine x1 = "));
   Debug.print(x1);
@@ -69,12 +69,4 @@ void drawRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
   fillRect(x, y, 1, h, color);
   fillRect(x + w - 1, y, 1, h, color);
   fillRect(x, y + h - 1, w, 1, color);
-}
-
-void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
-  if (x1 < x2) {
-    _drawLine(x1, y1, x2, y2);
-  } else {
-    _drawLine(x2, y2, x1, y1);
-  }
 }
