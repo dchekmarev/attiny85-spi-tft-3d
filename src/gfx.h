@@ -15,6 +15,18 @@ uint16_t color = 0;
 
 #define diff(a, b) (max(a, b) - min(a, b))
 
+#define swap_u16(a, b) { uint16_t t = a; a = b; b = t; }
+__attribute__((noinline))
+void fillRectMinMaxCoords(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color) {
+  if (x1 > x2) {
+    swap_u16(x1, x2);
+  }
+  if (y1 > y2) {
+    swap_u16(y1, y2);
+  }
+  fillRect(x1, y1, max(x2 - x1, 1), max(y2 - y1, 1), color);
+}
+
 void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
 #if DEBUG_ENABLED == 1
   Debug.print(F("_drawLine x1 = "));
@@ -31,7 +43,7 @@ void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
   int16_t dy = y2 - y1;
   if (dx == 0 || dy == 0) {
     // vertical / horizontal
-    fillRect(min(x1, x2), min(y1, y2), diff(x2, x1) + 1, diff(y2, y1) + 1, color);
+    fillRectMinMaxCoords(x1, y1, x2, y2, color);
   } else {
     // non-vertical
     int16_t step_x, step_y;
@@ -57,7 +69,7 @@ void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
       if (min(y1, new_y) <= y2 && max(y1, new_y) >= y2) {
         new_y = y2;
       }
-      fillRect(min(x1, new_x) / 100, min(y1, new_y) / 100, diff(x1, new_x) / 100, diff(y1, new_y) / 100, color);
+      fillRectMinMaxCoords(x1 / 100, y1 / 100, new_x / 100, new_y / 100, color);
       x1 = new_x;
       y1 = new_y;
     }
