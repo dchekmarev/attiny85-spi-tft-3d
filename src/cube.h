@@ -73,10 +73,9 @@ void cube_calculate() {
   // calculate the points
   for (uint8_t i = 0; i < NPOINTS; i++) {
     // project 3d points into 2d space with perspective divide -- 2D x = x/z,   2D y = y/z
-    float zRatio = (rotated_3d_points[i][2] + z_offset) / cube_size;
-    // instead of round just convert to uint - saves (2 * 24) bytes here
-    points[i][0] = (CUBE_SIZE / 2) + (int16_t) (rotated_3d_points[i][0] / zRatio);
-    points[i][1] = (CUBE_SIZE / 2) + (int16_t) (rotated_3d_points[i][1] / zRatio);
+    float zRatio = rotated_3d_points[i][2] + z_offset;
+    points[i][0] = (CUBE_SIZE / 2) + (int16_t) (rotated_3d_points[i][0] * cube_size / zRatio);
+    points[i][1] = (CUBE_SIZE / 2) + (int16_t) (rotated_3d_points[i][1] * cube_size / zRatio);
   }
 }
 
