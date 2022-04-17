@@ -31,7 +31,7 @@ void _drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
   int16_t dy = y2 - y1;
   if (dx == 0 || dy == 0) {
     // vertical / horizontal
-    // fillRect(min(x1, x2), min(y1, y2), diff(x2, x1) + 1, diff(y2, y1) + 1, color);
+    fillRect(min(x1, x2), min(y1, y2), diff(x2, x1) + 1, diff(y2, y1) + 1, color);
   } else {
     // non-vertical
     int16_t step_x, step_y;
