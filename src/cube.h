@@ -23,19 +23,19 @@ uint16_t time_frame;        // ever increasing time value
 /**
  * rotate point around given axis by given degree
  */
-void rotate(uint16_t angle_deg, uint8_t axis0, int16_t rotated_3d_points[3]) {
+void rotate(uint16_t angle_deg, uint8_t axis0, int16_t point_coords[3]) {
   // rotate 3d points in given 2-axis projection
   uint8_t axis1 = axis0 == 1 ? 0 : 1;
   uint8_t axis2 = axis0 == 2 ? 0 : 2;
   int16_t cos_val = (int16_t) (cos(radians(angle_deg)) * 100);
   int16_t sin_val = (int16_t) (sin(radians(angle_deg)) * 100);
 
-  int16_t axis0_coord = (rotated_3d_points[axis0] * cos_val - rotated_3d_points[axis2] * sin_val) / 100;
-  int16_t axis1_coord = rotated_3d_points[axis1];
-  int16_t axis2_coord = (rotated_3d_points[axis0] * sin_val + rotated_3d_points[axis2] * cos_val) / 100;
-  rotated_3d_points[axis0] = axis0_coord;
-  rotated_3d_points[axis1] = axis1_coord;
-  rotated_3d_points[axis2] = axis2_coord;
+  int16_t axis0_coord = (point_coords[axis0] * cos_val - point_coords[axis2] * sin_val) / 100;
+  int16_t axis1_coord = point_coords[axis1];
+  int16_t axis2_coord = (point_coords[axis0] * sin_val + point_coords[axis2] * cos_val) / 100;
+  point_coords[axis0] = axis0_coord;
+  point_coords[axis1] = axis1_coord;
+  point_coords[axis2] = axis2_coord;
 }
 
 void cube_update() {
