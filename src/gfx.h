@@ -31,31 +31,36 @@ void _drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
   int16_t dy = y2 - y1;
   if (dx == 0 || dy == 0) {
     // vertical / horizontal
-    fillRect(min(x1, x2), min(y1, y2), diff(x2, x1) + 1, diff(y2, y1) + 1, color);
+    // fillRect(min(x1, x2), min(y1, y2), diff(x2, x1) + 1, diff(y2, y1) + 1, color);
   } else {
     // non-vertical
-    float step_x, step_y, x = x1, y = y1;
+    int16_t step_x, step_y;
 
     if (abs(dy) <= abs(dx)) {
       // it's more horizontal, draw with hLines
-      step_x = (float) dx / abs(dy);
-      step_y = (float) dy / abs(dy);
+      step_x = 100 * dx / abs(dy);
+      step_y = 100 * dy / abs(dy);
     } else {
       // it's more vertical, draw with vLines
-      step_x = (float) dx / abs(dx);
-      step_y = (float) dy / abs(dx);
+      step_x = 100 * dx / abs(dx);
+      step_y = 100 * dy / abs(dx);
     }
 
-    while (round(x) != x2 || round(y) != y2) {
-      fillRect(min(x, x + step_x), min(y, y + step_y), abs(step_x), abs(step_y), color);
-      if (round(x) != x2) {
-        x += step_x;
-      }
-      if (round(y) != y2) {
-        y += step_y;
-      }
-    }
+    x1 *= 100; y1 *= 100; x2 *= 100; y2 *= 100;
 
+    while ((x1 != x2) || (y1 != y2)) {
+      uint16_t new_x = (int16_t) x1 + step_x;
+      uint16_t new_y = (int16_t) y1 + step_y;
+      if (min(x1, new_x) <= x2 && max(x1, new_x) >= x2) {
+        new_x = x2;
+      }
+      if (min(y1, new_y) <= y2 && max(y1, new_y) >= y2) {
+        new_y = y2;
+      }
+      fillRect(min(x1, new_x) / 100, min(y1, new_y) / 100, diff(x1, new_x) / 100, diff(y1, new_y) / 100, color);
+      x1 = new_x;
+      y1 = new_y;
+    }
   }
 }
 
