@@ -18,7 +18,7 @@ uint16_t angle_deg_0 = 60;         // rotation around the Y axis
 uint16_t angle_deg_1 = 60;         // rotation around the X axis
 uint16_t angle_deg_2 = 60;         // rotation around the Z axis
 #define z_offset -4.0              // offset on Z axis
-float time_frame;               // ever increasing time value
+uint16_t time_frame;               // ever increasing time value
 
 /**
  * rotate points around given axis by given degree
@@ -41,7 +41,7 @@ void rotate(uint16_t angle_deg, uint8_t axis0, float rotated_3d_points[NPOINTS][
 }
 
 void cube_update() {
-  time_frame++;
+  time_frame = (time_frame + 1) % (50 * 360); // to keep it cyclic
 
   angle_deg_0 = (angle_deg_0 + 3) % 360;
   angle_deg_1 = (angle_deg_1 + 5) % 360;
