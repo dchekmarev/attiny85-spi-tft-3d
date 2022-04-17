@@ -1,16 +1,7 @@
-// void command(uint8_t c) {
-//   // DC_LOW;
-//   digitalWrite(TFT_DC, LOW);
-//   transfer(c);
-// }
-
-// void data(uint8_t c) {
-//   // DC_HIGH;
-//   digitalWrite(TFT_DC, HIGH);
-//   transfer(c);
-// }
-
 #define OUT_REG PORTB
+
+// #define DC_HIGH digitalWrite(TFT_DC, HIGH)
+// #define DC_LOW digitalWrite(TFT_DC, LOW)
 
 #define DC_HIGH (OUT_REG |= (1 << TFT_DC))
 #define DC_LOW (OUT_REG &= ~(1 << TFT_DC))
@@ -42,18 +33,6 @@ void setAddrAndRW_cont(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
 }
 
 void fillRect(uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t c) {
-#if DEBUG_ENABLED == 1
-  Debug.print(F("fillRect x = "));
-  Debug.print(x);
-  Debug.print(F(", y = "));
-  Debug.print(y);
-  Debug.print(F(", w = "));
-  Debug.print(w);
-  Debug.print(F(", h = "));
-  Debug.print(h);
-  Debug.print(F(", c = "));
-  Debug.println(c);
-#endif
   w = min(w, SCREEN_WIDTH - x);
   h = min(h, SCREEN_HEIGHT - y);
   setAddrAndRW_cont(x, y, x + w - 1, y + h - 1);
