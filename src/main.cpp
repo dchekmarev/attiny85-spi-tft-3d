@@ -1,9 +1,7 @@
 /**
- * IN PROGRESS, NOTHING WORKS HERE YET
+ * a floating 3d cube on ili9341 over spi running on attiny85
  *
  * check out oled/i2c version at https://wokwi.com/projects/328750728540586580
- *
- * https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-2586-AVR-8-bit-Microcontroller-ATtiny25-ATtiny45-ATtiny85_Datasheet.pdf
  */
 
 #include <Arduino.h>
@@ -213,7 +211,7 @@ void cubeLoop() {
   color = colors[c];
   cube_render(points);
 
-  delay(10);
+  // delay(10);
 
 }
 
@@ -231,10 +229,12 @@ void loop() {
 
   if (totalTimeSum > 5000 || count > 500) { // print stats every ~5000ms
     uint32_t millisPerCycle = totalTimeSum / count;
-    Serial.print(F("cycle millis: "));
+    Serial.print(millis());
+    Serial.print(F("] cycle millis: "));
     Serial.print(millisPerCycle);
     Serial.print(F(", fps: "));
-    Serial.println(1000 * count / totalTimeSum);
+    Serial.println((uint32_t) 1000 * count / totalTimeSum);
+    Serial.flush();
     count = totalTimeSum = 0;
   }
 #endif
