@@ -13,9 +13,8 @@ void clearRect(uint16_t x, uint16_t y, int16_t w, int16_t h) {
 
 uint16_t color = 0;
 
-#define diff(a, b) (max(a, b) - min(a, b))
-
 #define swap_u16(a, b) { uint16_t t = a; a = b; b = t; }
+
 __attribute__((noinline))
 void fillRectMinMaxCoords(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, uint16_t color) {
   if (x1 > x2) {
@@ -26,6 +25,8 @@ void fillRectMinMaxCoords(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, ui
   }
   fillRect(x1, y1, max(x2 - x1, 1), max(y2 - y1, 1), color);
 }
+
+#define FLOAT_FACTOR 100
 
 void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
 #if DEBUG_ENABLED == 1
@@ -46,30 +47,26 @@ void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
     fillRectMinMaxCoords(x1, y1, x2, y2, color);
   } else {
     // non-vertical
-    int16_t step_x, step_y;
+    uint16_t abs_dy = abs(dy);
+    uint16_t abs_dx = abs(dx);
+    // horizontal vs vertical
+    int16_t step_size = min(abs_dy, abs_dx);
+    int16_t step_x = FLOAT_FACTOR * dx / step_size;
+    int16_t step_y = FLOAT_FACTOR * dy / step_size;
 
-    if (abs(dy) <= abs(dx)) {
-      // it's more horizontal, draw with hLines
-      step_x = 100 * dx / abs(dy);
-      step_y = 100 * dy / abs(dy);
-    } else {
-      // it's more vertical, draw with vLines
-      step_x = 100 * dx / abs(dx);
-      step_y = 100 * dy / abs(dx);
-    }
+    x1 *= FLOAT_FACTOR; y1 *= FLOAT_FACTOR; x2 *= FLOAT_FACTOR; y2 *= FLOAT_FACTOR;
 
-    x1 *= 100; y1 *= 100; x2 *= 100; y2 *= 100;
-
+    #define between(a, b, inner) ((a <= inner && inner <= b) || (b <= inner && inner <= a))
     while ((x1 != x2) || (y1 != y2)) {
       uint16_t new_x = (int16_t) x1 + step_x;
       uint16_t new_y = (int16_t) y1 + step_y;
-      if (min(x1, new_x) <= x2 && max(x1, new_x) >= x2) {
+      if (between(x1, new_x, x2)) {
         new_x = x2;
       }
-      if (min(y1, new_y) <= y2 && max(y1, new_y) >= y2) {
+      if (between(y1, new_y, y2)) {
         new_y = y2;
       }
-      fillRectMinMaxCoords(x1 / 100, y1 / 100, new_x / 100, new_y / 100, color);
+      fillRectMinMaxCoords(x1 / FLOAT_FACTOR, y1 / FLOAT_FACTOR, new_x / FLOAT_FACTOR, new_y / FLOAT_FACTOR, color);
       x1 = new_x;
       y1 = new_y;
     }
