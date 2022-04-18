@@ -70,6 +70,8 @@ static const uint8_t init_commands[] =
 
 #include "gfx.h"
 
+#include "shape.h"
+
 void tft_init() {
   DDRB |= _BV(TFT_DC);  // enable tft dc (pb3) as output
   PORTB |= _BV(TFT_DC); // set to high
@@ -110,6 +112,8 @@ void setup() {
   spi_init();
 
   tft_init();
+
+  shape_init();
 
   fillRect(0, 0, 240, 320, 0);
 
@@ -163,8 +167,6 @@ void floatingBoxLoop() {
   fillRect(x, y, BOX_WIDTH, BOX_HEIGHT, colors[c]);
 
 }
-
-#include "shape.h"
 
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
   drawLine(points[i][0] + x, points[i][1] + y, points[j][0] + x, points[j][1] + y);
