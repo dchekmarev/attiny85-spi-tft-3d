@@ -52,7 +52,7 @@ void cube_update() {
 
 void cube_calculate() {
   cube_update();
-  int16_t cube_size = (CUBE_SIZE - 15 - 1) + sin(time_frame * 0.2) * 15;
+  int16_t cube_size = (CUBE_SIZE * 2 / 3) + sin(time_frame * 0.05) * (CUBE_SIZE / 3);
 
   int16_t rotated_3d_points[3];  // eight 3D points - rotated around Y axis
   // init points
