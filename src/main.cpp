@@ -69,7 +69,8 @@ static const uint8_t init_commands[] =
 #include "gfx.h"
 
 void tft_init() {
-  pinMode(TFT_DC, OUTPUT);
+  DDRB |= _BV(TFT_DC);  // enable tft dc (pb3) as output
+  PORTB |= _BV(TFT_DC); // set to high
 
   for (uint8_t i = 0; i < sizeof(init_commands); ++i) {
     uint8_t cmd_size = init_commands[i];
@@ -94,9 +95,7 @@ void tft_init() {
 }
 
 void setup() {
-  pinMode(PB4, OUTPUT);
-  pinMode(TFT_DC, OUTPUT);
-  digitalWrite(TFT_DC, HIGH);
+  DDRB |= _BV(PB4);  // enable serial port (pb4) as output
 #if SERIAL_ENABLED == 1
   Serial.begin(9600);
 #endif

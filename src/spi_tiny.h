@@ -2,7 +2,6 @@
 // #include <SPI.h>
 
 void spi_init() {
-  pinMode(TFT_DC, OUTPUT);
   SPI.begin();                   // start hardware SPI (the library sets up the clock and data pins)
 }
 
