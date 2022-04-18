@@ -1,5 +1,5 @@
 /**
- * a floating 3d cube on ili9341 over spi running on attiny85
+ * a floating 3d shape on ili9341 over spi running on attiny85
  *
  * check out oled/i2c version at https://wokwi.com/projects/328750728540586580
  */
@@ -164,13 +164,13 @@ void floatingBoxLoop() {
 
 }
 
-#include "cube.h"
+#include "shape.h"
 
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
   drawLine(points[i][0] + x, points[i][1] + y, points[j][0] + x, points[j][1] + y);
 }
 
-void cubeLoop() {
+void shapeLoop() {
   unsigned long nowMillis = millis();
   if (nowMillis > lastColorChange) {
     c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
@@ -199,10 +199,10 @@ void cubeLoop() {
   uint16_t old_points[NPOINTS][2];
   memmove(old_points, points, sizeof(uint16_t) * NPOINTS * 2);
 
-  cube_calculate();
+  shape_calculate();
 
   color = 0;
-  cube_render(old_points);
+  shape_render(old_points);
 
   x += dx;
   y += dy;
@@ -211,7 +211,7 @@ void cubeLoop() {
 #endif
 
   color = colors[c];
-  cube_render(points);
+  shape_render(points);
 }
 
 void loop() {
@@ -220,7 +220,7 @@ void loop() {
   uint32_t loopStart = millis();
 #endif
 
-  cubeLoop();
+  shapeLoop();
   // fillScreenLoop();
   // floatingBoxLoop();
 

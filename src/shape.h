@@ -1,11 +1,14 @@
-#define CUBE_SIZE 64
-
-#define NPOINTS 8
-
-uint16_t points[NPOINTS][2];  // eight 2D points for the cube, values will be calculated in the code
+#define CUBE_SIZE 128
 
 #define FLOAT_FACTOR 64 // instead of using floats, we ok to have precission of 1/64 & we know numbers*64 are within uint16_t
 
+void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
+
+#define SHAPE 1
+
+#if SHAPE == 1
+
+#define NPOINTS 8
 static const int8_t orig_points[NPOINTS][3] = {  // eight 3D points - set values for 3D cube
     {-1, -1, 1},
     {1, -1, 1},
@@ -15,6 +18,29 @@ static const int8_t orig_points[NPOINTS][3] = {  // eight 3D points - set values
     {1, -1, -1},
     {1, 1, -1},
     {-1, 1, -1}};
+
+void shape_init() {}
+
+void shape_render(uint16_t points[][2]) {
+  // connect the lines between the individual points
+  for (uint8_t i = 0; i < 4; i++) {
+    connectPoints(i, (i + 1) % 4, points);
+    connectPoints(4 + i, 4 + (i + 1) % 4, points);
+    connectPoints(i, 4 + i, points);
+  }
+}
+
+#elif SHAPE == 2
+#define NPOINTS 0
+static const int8_t orig_points[NPOINTS][3];
+
+void shape_init() {}
+
+void shape_render(uint16_t points[][2]) {}
+
+#endif
+
+uint16_t points[NPOINTS][2];  // eight 2D points for the cube, values will be calculated in the code
 
 uint16_t angle_deg_0 = 60;  // rotation around the Y axis
 uint16_t angle_deg_1 = 60;  // rotation around the X axis
@@ -40,7 +66,7 @@ void rotate(uint16_t angle_deg, uint8_t axis0, int16_t point_coords[3]) {
   point_coords[axis2] = axis2_coord;
 }
 
-void cube_update() {
+void shape_update() {
   time_frame = (time_frame + 1) % (50 * 360);  // to keep it cyclic
 
   angle_deg_0 = (angle_deg_0 + 3) % 360;
@@ -52,9 +78,9 @@ void cube_update() {
 #endif
 }
 
-void cube_calculate() {
-  cube_update();
-  int16_t cube_size = (CUBE_SIZE * 2 / 3) + sin(time_frame * 0.05) * (CUBE_SIZE / 3);
+void shape_calculate() {
+  shape_update();
+  int16_t cube_size = (CUBE_SIZE * 2 / 3) + sin(time_frame * 0.05) * (CUBE_SIZE / 4);
 
   int16_t rotated_3d_points[3];  // eight 3D points - rotated around Y axis
   // init points
@@ -77,13 +103,3 @@ void cube_calculate() {
   }
 }
 
-void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
-
-void cube_render(uint16_t points[][2]) {
-  // connect the lines between the individual points
-  for (uint8_t i = 0; i < 4; i++) {
-    connectPoints(i, (i + 1) % 4, points);
-    connectPoints(4 + i, 4 + (i + 1) % 4, points);
-    connectPoints(i, 4 + i, points);
-  }
-}
