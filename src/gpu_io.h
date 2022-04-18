@@ -19,15 +19,15 @@ void data(uint8_t c) {
 void setAddrAndRW_cont(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
   command(ILI9341_CASET); // Column addr set
   data(x1 >> 8);
-  data(x1 & 0xFF);     // XSTART
-  data(x2 >> 8);
-  data(x2 & 0xFF);     // XEND
+  transfer(x1 & 0xFF);     // XSTART
+  transfer(x2 >> 8);
+  transfer(x2 & 0xFF);     // XEND
 
   command(ILI9341_PASET); // Row addr set
   data(y1 >> 8);
-  data(y1 & 0xFF);     // YSTART
-  data(y2 >> 8);
-  data(y2 & 0xFF);     // YEND
+  transfer(y1 & 0xFF);     // YSTART
+  transfer(y2 >> 8);
+  transfer(y2 & 0xFF);     // YEND
 
   command(ILI9341_RAMWR); // write to RAM
 }
