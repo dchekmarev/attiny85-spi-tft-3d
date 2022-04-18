@@ -6,6 +6,8 @@
 
 #include <Arduino.h>
 
+#include <util/delay.h>
+
 // #define DEBUG_ENABLED 1
 // #define SERIAL_ENABLED 1
 
@@ -89,9 +91,9 @@ void tft_init() {
   }
 
   command(ILI9341_SLPOUT);    //Exit Sleep
-  delay(120);
+  _delay_ms(120); // btw, 12 bytes each call
   command(ILI9341_DISPON);
-  delay(120);
+  _delay_ms(120);
 }
 
 void setup() {
@@ -210,9 +212,6 @@ void cubeLoop() {
 
   color = colors[c];
   cube_render(points);
-
-  // delay(10);
-
 }
 
 void loop() {
@@ -239,6 +238,8 @@ void loop() {
     Serial.flush();
     count = totalTimeSum = 0;
   }
+#else
+  _delay_ms(10);
 #endif
 
 }
