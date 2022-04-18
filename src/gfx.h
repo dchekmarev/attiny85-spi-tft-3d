@@ -26,7 +26,7 @@ void fillRectMinMaxCoords(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2, ui
   fillRect(x1, y1, max(x2 - x1, 1), max(y2 - y1, 1), color);
 }
 
-#define FLOAT_FACTOR 100
+#define FLOAT_FACTOR 64 // instead of using floats, we ok to have precission of 1/64 & we know numbers*64 are within uint16_t
 
 void drawLine(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
 #if DEBUG_ENABLED == 1
