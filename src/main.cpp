@@ -78,6 +78,9 @@ void tft_init() {
 
   for (uint8_t i = 0; i < sizeof(init_commands); ++i) {
     uint8_t cmd_size = init_commands[i];
+    if (!cmd_size) {
+      continue;
+    }
     command(init_commands[++i]);
 #if DEBUG_ENABLED == 1
     Debug.print(F("i = "));
