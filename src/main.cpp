@@ -151,7 +151,7 @@ void fillScreenLoop() {
   fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
 }
 
-unsigned long lastColorChange;
+uint16_t framesTillColorChange = 0;
 
 void floatingBoxLoop() {
 
@@ -178,10 +178,9 @@ void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
 
 uint16_t old_points[NPOINTS][2];
 void shapeLoop() {
-  unsigned long nowMillis = millis();
-  if (nowMillis > lastColorChange) {
+  if (0 == framesTillColorChange--) {
     c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
-    lastColorChange = nowMillis + 5000;
+    framesTillColorChange = 20 * 5; // 20 fps * 5 seconds
 
     drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
     // boxes at corners
