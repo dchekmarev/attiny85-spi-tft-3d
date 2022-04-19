@@ -42,25 +42,25 @@ void shape_render(uint16_t points[][2]) {
 #elif SHAPE == 2
 
 #define N_C_POINTS 8
+#define N_CIRCLES 3
 
-#define NPOINTS (N_C_POINTS * 3)
+#define NPOINTS (N_C_POINTS * N_CIRCLES)
 static int8_t orig_points[NPOINTS][3];
 
 void shape_init() {
-  for (uint8_t i = 0; i < N_C_POINTS; i++) {
-    for (uint8_t o = 0; o < NPOINTS; o += N_C_POINTS) {
-      orig_points[o + i][2] = o * 2;
-      orig_points[o + i][0] = (int16_t) (cos(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR);
-      orig_points[o + i][1] = (int16_t) (sin(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR);
+  for (uint8_t o = 0; o < N_CIRCLES; o++) {
+    for (uint8_t i = 0; i < N_C_POINTS; i++) {
+      orig_points[o * N_C_POINTS + i][2] = o * 10;
+      orig_points[o * N_C_POINTS + i][0] = (int16_t) (cos(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR);
+      orig_points[o * N_C_POINTS + i][1] = (int16_t) (sin(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR);
     }
   }
 }
 
 void shape_render(uint16_t points[][2]) {
-  for (uint8_t i = 0; i < N_C_POINTS; i++) {
-    for (uint8_t o = 0; o < NPOINTS; o += N_C_POINTS) {
-      connectPoints(o + i, o + (i + 1) % N_C_POINTS, points);
-      connectPoints(o + i, o + (i + 1) % N_C_POINTS, points);
+  for (uint8_t o = 0; o < N_CIRCLES; o++) {
+    for (uint8_t i = 0; i < N_C_POINTS; i++) {
+      connectPoints(o*N_C_POINTS + i, o*N_C_POINTS + (i + 1) % N_C_POINTS, points);
     }
   }
 }
