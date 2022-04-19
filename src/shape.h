@@ -105,11 +105,13 @@ void shape_update() {
 #endif
 }
 
+// TODO replace with 3 integers - probably will be placed inside registers
+int16_t rotated_3d_point[3];  // eight 3D points - rotated around Y axis
+
 void shape_calculate() {
   shape_update();
   int16_t cube_size = (CUBE_SIZE * 2 / 3) + sin(time_frame * 0.05) * (CUBE_SIZE / 4);
 
-  int16_t rotated_3d_point[3];  // eight 3D points - rotated around Y axis
   // init points
   for (uint8_t i = 0; i < NPOINTS; ++i) {
     rotated_3d_point[0] = orig_points[i][0];

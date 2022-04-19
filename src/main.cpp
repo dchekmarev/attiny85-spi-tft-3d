@@ -175,6 +175,7 @@ void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
   drawLine(points[i][0] + x, points[i][1] + y, points[j][0] + x, points[j][1] + y);
 }
 
+uint16_t old_points[NPOINTS][2];
 void shapeLoop() {
   unsigned long nowMillis = millis();
   if (nowMillis > lastColorChange) {
@@ -201,7 +202,6 @@ void shapeLoop() {
     dy = -dy;
   }
 
-  uint16_t old_points[NPOINTS][2];
   memmove(old_points, points, sizeof(uint16_t) * NPOINTS * 2);
 
   shape_calculate();
