@@ -41,7 +41,7 @@ SoftwareSerial serial(rxPin, txPin);
 
 #include "ILI9341.h"
 
-static const uint8_t init_commands[] =
+static const uint8_t init_commands[] PROGMEM =
 {
     1, ILI9341_SWRESET,
     4, 0xEF, 0x03, 0x80, 0x02,
@@ -65,7 +65,7 @@ static const uint8_t init_commands[] =
     0x4E, 0xF1, 0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00, // Set Gamma
     16, ILI9341_GMCTRN1, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07,
     0x31, 0xC1, 0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F, // Set Gamma
-    0
+    0 // 0 indicates last command
 };
 
 #include "gfx.h"
@@ -76,12 +76,13 @@ void tft_init() {
   DDRB |= _BV(TFT_DC);  // enable tft dc (pb3) as output
   PORTB |= _BV(TFT_DC); // set to high
 
-  for (uint8_t i = 0; i < sizeof(init_commands); ++i) {
-    uint8_t cmd_size = init_commands[i];
+  uint8_t *init_commands_ptr = init_commands;
+  for (;;) {
+    uint8_t cmd_size = pgm_read_byte(init_commands_ptr++);
     if (!cmd_size) {
-      continue;
+      break;
     }
-    command(init_commands[++i]);
+    command(pgm_read_byte(init_commands_ptr++));
 #if DEBUG_ENABLED == 1
     Debug.print(F("i = "));
     Debug.print(i);
@@ -91,7 +92,7 @@ void tft_init() {
     Debug.println(init_commands[i]);
 #endif
     for (--cmd_size; cmd_size > 0; --cmd_size) {
-      data(init_commands[++i]);
+      data(pgm_read_byte(init_commands_ptr++));
     }
   }
 
