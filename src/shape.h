@@ -9,7 +9,8 @@ void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 #if SHAPE == 1
 
 #define NPOINTS 8
-static const int8_t orig_points[NPOINTS][3] = {  // eight 3D points - set values for 3D cube
+
+static int8_t orig_points[8][3] = {  // eight 3D points - set values for 3D cube
     {-1, -1, 1},
     {1, -1, 1},
     {1, 1, 1},
@@ -19,7 +20,13 @@ static const int8_t orig_points[NPOINTS][3] = {  // eight 3D points - set values
     {1, 1, -1},
     {-1, 1, -1}};
 
-void shape_init() {}
+void shape_init() {
+  for (uint8_t i = 0; i < NPOINTS; ++i) {
+    orig_points[i][0] *= FLOAT_FACTOR;
+    orig_points[i][1] *= FLOAT_FACTOR;
+    orig_points[i][2] *= FLOAT_FACTOR;
+  }
+}
 
 void shape_render(uint16_t points[][2]) {
   // connect the lines between the individual points
@@ -85,9 +92,9 @@ void shape_calculate() {
   int16_t rotated_3d_points[3];  // eight 3D points - rotated around Y axis
   // init points
   for (uint8_t i = 0; i < NPOINTS; ++i) {
-    rotated_3d_points[0] = orig_points[i][0] * FLOAT_FACTOR;
-    rotated_3d_points[1] = orig_points[i][1] * FLOAT_FACTOR;
-    rotated_3d_points[2] = orig_points[i][2] * FLOAT_FACTOR;
+    rotated_3d_points[0] = orig_points[i][0];
+    rotated_3d_points[1] = orig_points[i][1];
+    rotated_3d_points[2] = orig_points[i][2];
 
     // rotate to current position
     rotate(angle_deg_0, 0, rotated_3d_points);
