@@ -75,22 +75,29 @@ uint16_t angle_deg_2 = 60;  // rotation around the Z axis
 #define z_offset -4.0       // offset on Z axis
 uint16_t time_frame;        // ever increasing time value
 
-/**
- * rotate point around given axis by given degree
- */
-void rotate(uint16_t angle_deg, uint8_t axis0, int16_t point_coords[3]) {
+struct coord_3d { int16_t x; int16_t y; int16_t z; };
+
+void rotate_pair(uint16_t angle_deg, int16_t &coordA, int16_t &coordB) {
   // rotate 3d points in given 2-axis projection
-  uint8_t axis1 = axis0 == 1 ? 0 : 1;
-  uint8_t axis2 = axis0 == 2 ? 0 : 2;
   int16_t cos_val = (int16_t) (cos(radians(angle_deg)) * FLOAT_FACTOR);
   int16_t sin_val = (int16_t) (sin(radians(angle_deg)) * FLOAT_FACTOR);
 
-  int16_t axis0_coord = (point_coords[axis0] * cos_val - point_coords[axis2] * sin_val) / FLOAT_FACTOR;
-  int16_t axis1_coord = point_coords[axis1];
-  int16_t axis2_coord = (point_coords[axis0] * sin_val + point_coords[axis2] * cos_val) / FLOAT_FACTOR;
-  point_coords[axis0] = axis0_coord;
-  point_coords[axis1] = axis1_coord;
-  point_coords[axis2] = axis2_coord;
+  int16_t old_x = coordA;
+  coordA = (coordA * cos_val - coordB * sin_val) / FLOAT_FACTOR;
+  coordB = (coordB * cos_val + old_x * sin_val) / FLOAT_FACTOR;
+}
+
+/**
+ * rotate point around given axis by given degree
+ */
+void rotate(uint16_t angle_deg, uint8_t axis0, coord_3d &point_coords) {
+  if (axis0 == 0) {
+    rotate_pair(angle_deg, point_coords.y, point_coords.z);
+  } else if (axis0 == 1) {
+    rotate_pair(angle_deg, point_coords.x, point_coords.z);
+  } else {
+    rotate_pair(angle_deg, point_coords.x, point_coords.y);
+  }
 }
 
 void shape_update() {
@@ -106,7 +113,7 @@ void shape_update() {
 }
 
 // TODO replace with 3 integers - probably will be placed inside registers
-int16_t rotated_3d_point[3];  // eight 3D points - rotated around Y axis
+coord_3d rotated_3d_point;  // eight 3D points - rotated around Y axis
 
 void shape_calculate() {
   shape_update();
@@ -114,9 +121,9 @@ void shape_calculate() {
 
   // init points
   for (uint8_t i = 0; i < NPOINTS; ++i) {
-    rotated_3d_point[0] = orig_points[i][0];
-    rotated_3d_point[1] = orig_points[i][1];
-    rotated_3d_point[2] = orig_points[i][2];
+    rotated_3d_point.x = orig_points[i][0];
+    rotated_3d_point.y = orig_points[i][1];
+    rotated_3d_point.z = orig_points[i][2];
 
     // rotate to current position
     rotate(angle_deg_0, 0, rotated_3d_point);
@@ -126,9 +133,9 @@ void shape_calculate() {
     // calculate the points
 
     // project 3d points into 2d space with perspective divide -- 2D x = x/z,   2D y = y/z
-    int16_t zRatio = rotated_3d_point[2] + z_offset * FLOAT_FACTOR;
-    points[i][0] = (CUBE_SIZE / 2) + (rotated_3d_point[0] * cube_size / zRatio);
-    points[i][1] = (CUBE_SIZE / 2) + (rotated_3d_point[1] * cube_size / zRatio);
+    int16_t zRatio = rotated_3d_point.z + z_offset * FLOAT_FACTOR;
+    points[i][0] = (CUBE_SIZE / 2) + (rotated_3d_point.x * cube_size / zRatio);
+    points[i][1] = (CUBE_SIZE / 2) + (rotated_3d_point.y * cube_size / zRatio);
   }
 }
 
