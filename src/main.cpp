@@ -76,7 +76,7 @@ void tft_init() {
   DDRB |= _BV(TFT_DC);  // enable tft dc (pb3) as output
   PORTB |= _BV(TFT_DC); // set to high
 
-  uint8_t *init_commands_ptr = init_commands;
+  const uint8_t *init_commands_ptr = init_commands;
   for (;;) {
     uint8_t cmd_size = pgm_read_byte(init_commands_ptr++);
     if (!cmd_size) {
