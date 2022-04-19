@@ -109,24 +109,24 @@ void shape_calculate() {
   shape_update();
   int16_t cube_size = (CUBE_SIZE * 2 / 3) + sin(time_frame * 0.05) * (CUBE_SIZE / 4);
 
-  int16_t rotated_3d_points[3];  // eight 3D points - rotated around Y axis
+  int16_t rotated_3d_point[3];  // eight 3D points - rotated around Y axis
   // init points
   for (uint8_t i = 0; i < NPOINTS; ++i) {
-    rotated_3d_points[0] = orig_points[i][0];
-    rotated_3d_points[1] = orig_points[i][1];
-    rotated_3d_points[2] = orig_points[i][2];
+    rotated_3d_point[0] = orig_points[i][0];
+    rotated_3d_point[1] = orig_points[i][1];
+    rotated_3d_point[2] = orig_points[i][2];
 
     // rotate to current position
-    rotate(angle_deg_0, 0, rotated_3d_points);
-    rotate(angle_deg_1, 1, rotated_3d_points);
-    rotate(angle_deg_2, 2, rotated_3d_points);
+    rotate(angle_deg_0, 0, rotated_3d_point);
+    rotate(angle_deg_1, 1, rotated_3d_point);
+    rotate(angle_deg_2, 2, rotated_3d_point);
 
     // calculate the points
 
     // project 3d points into 2d space with perspective divide -- 2D x = x/z,   2D y = y/z
-    int16_t zRatio = rotated_3d_points[2] + z_offset * FLOAT_FACTOR;
-    points[i][0] = (CUBE_SIZE / 2) + (rotated_3d_points[0] * cube_size / zRatio);
-    points[i][1] = (CUBE_SIZE / 2) + (rotated_3d_points[1] * cube_size / zRatio);
+    int16_t zRatio = rotated_3d_point[2] + z_offset * FLOAT_FACTOR;
+    points[i][0] = (CUBE_SIZE / 2) + (rotated_3d_point[0] * cube_size / zRatio);
+    points[i][1] = (CUBE_SIZE / 2) + (rotated_3d_point[1] * cube_size / zRatio);
   }
 }
 
