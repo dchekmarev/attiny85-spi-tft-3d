@@ -4,6 +4,8 @@
 
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 
+struct coord_3d { int16_t x; int16_t y; int16_t z; };
+
 #define SHAPE 2
 
 #if SHAPE == 1
@@ -41,18 +43,29 @@ void shape_render(uint16_t points[][2]) {
 
 #elif SHAPE == 2
 
-#define N_C_POINTS 8
-#define N_CIRCLES 3
+#define N_CIRCLES 8
+#define N_C_POINTS 4
 
 #define NPOINTS (N_C_POINTS * N_CIRCLES)
 static int8_t orig_points[NPOINTS][3];
 
+void rotate(uint16_t angle_deg, uint8_t axis0, coord_3d &point_coords);
+
 void shape_init() {
   for (uint8_t o = 0; o < N_CIRCLES; o++) {
+    int16_t xc = (int16_t) (cos(radians(o * 360 / N_CIRCLES)) * FLOAT_FACTOR);
+    int16_t yc = (int16_t) (sin(radians(o * 360 / N_CIRCLES)) * FLOAT_FACTOR);
     for (uint8_t i = 0; i < N_C_POINTS; i++) {
-      orig_points[o * N_C_POINTS + i][2] = o * 10;
-      orig_points[o * N_C_POINTS + i][0] = (int16_t) (cos(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR);
-      orig_points[o * N_C_POINTS + i][1] = (int16_t) (sin(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR);
+      coord_3d p {
+         (int16_t) (sin(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR / 4),
+         (int16_t) (cos(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR / 4),
+         0
+      };
+      rotate(90, 0, p);
+      rotate(o * 360 / N_CIRCLES, 2, p);
+      orig_points[o * N_C_POINTS + i][0] = xc + p.x;
+      orig_points[o * N_C_POINTS + i][1] = yc + p.y;
+      orig_points[o * N_C_POINTS + i][2] = p.z;
     }
   }
 }
@@ -74,8 +87,6 @@ uint16_t angle_deg_1 = 60;  // rotation around the X axis
 uint16_t angle_deg_2 = 60;  // rotation around the Z axis
 #define z_offset -4.0       // offset on Z axis
 uint16_t time_frame;        // ever increasing time value
-
-struct coord_3d { int16_t x; int16_t y; int16_t z; };
 
 void rotate_pair(uint16_t angle_deg, int16_t &coordA, int16_t &coordB) {
   // rotate 3d points in given 2-axis projection
@@ -117,7 +128,7 @@ coord_3d rotated_3d_point;  // eight 3D points - rotated around Y axis
 
 void shape_calculate() {
   shape_update();
-  int16_t cube_size = (CUBE_SIZE * 2 / 3) + sin(time_frame * 0.05) * (CUBE_SIZE / 4);
+  int16_t cube_size = (CUBE_SIZE * 2 / 3) + sin(time_frame * 0.05) * (CUBE_SIZE / 8);
 
   // init points
   for (uint8_t i = 0; i < NPOINTS; ++i) {
