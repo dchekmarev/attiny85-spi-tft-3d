@@ -4,7 +4,7 @@
 
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 
-#define SHAPE 1
+#define SHAPE 2
 
 #if SHAPE == 1
 
@@ -38,12 +38,26 @@ void shape_render(uint16_t points[][2]) {
 }
 
 #elif SHAPE == 2
-#define NPOINTS 0
-static const int8_t orig_points[NPOINTS][3];
 
-void shape_init() {}
+#define N_C_POINTS 16
 
-void shape_render(uint16_t points[][2]) {}
+#define NPOINTS (N_C_POINTS + 0)
+static int8_t orig_points[NPOINTS][3];
+
+void shape_init() {
+  for (uint8_t i = 0; i < N_C_POINTS; i++) {
+    orig_points[i][2] = 0;
+    #define r = 100
+    orig_points[i][0] = (int16_t) (cos(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR);
+    orig_points[i][1] = (int16_t) (sin(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR);
+  }
+}
+
+void shape_render(uint16_t points[][2]) {
+  for (uint8_t i = 0; i < N_C_POINTS; i++) {
+    connectPoints(i, (i + 1) % N_C_POINTS, points);
+  }
+}
 
 #endif
 
