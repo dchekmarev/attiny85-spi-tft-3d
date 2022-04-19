@@ -8,6 +8,8 @@ void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 
 #if SHAPE == 1
 
+// TODO try to not store points, store shape property (angles) and calculate points when using each
+
 #define NPOINTS 8
 
 static int8_t orig_points[8][3] = {  // eight 3D points - set values for 3D cube
