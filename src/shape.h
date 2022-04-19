@@ -49,7 +49,7 @@ void shape_render(uint16_t points[][2]) {
 #define NPOINTS (N_C_POINTS * N_CIRCLES)
 static int8_t orig_points[NPOINTS][3];
 
-void rotate(uint16_t angle_deg, uint8_t axis0, coord_3d &point_coords);
+void rotate(int16_t angle_deg, uint8_t axis0, coord_3d &point_coords);
 
 void shape_init() {
   for (uint8_t o = 0; o < N_CIRCLES; o++) {
@@ -73,7 +73,12 @@ void shape_init() {
 void shape_render(uint16_t points[][2]) {
   for (uint8_t o = 0; o < N_CIRCLES; o++) {
     for (uint8_t i = 0; i < N_C_POINTS; i++) {
-      connectPoints(o*N_C_POINTS + i, o*N_C_POINTS + (i + 1) % N_C_POINTS, points);
+      connectPoints(o * N_C_POINTS + i, o*N_C_POINTS + (i + 1) % N_C_POINTS, points);
+    }
+  }
+  for (uint8_t i = 0; i < N_C_POINTS; i++) {
+    for (uint8_t o = 0; o < N_CIRCLES; o++) {
+      connectPoints(o * N_C_POINTS + i, ((o + 1) % N_CIRCLES) * N_C_POINTS + i, points);
     }
   }
 }
@@ -82,13 +87,13 @@ void shape_render(uint16_t points[][2]) {
 
 uint16_t points[NPOINTS][2];  // eight 2D points for the cube, values will be calculated in the code
 
-uint16_t angle_deg_0 = 60;  // rotation around the Y axis
-uint16_t angle_deg_1 = 60;  // rotation around the X axis
-uint16_t angle_deg_2 = 60;  // rotation around the Z axis
+int16_t angle_deg_0 = 60;  // rotation around the Y axis
+int16_t angle_deg_1 = 60;  // rotation around the X axis
+int16_t angle_deg_2 = 60;  // rotation around the Z axis
 #define z_offset -4.0       // offset on Z axis
 uint16_t time_frame;        // ever increasing time value
 
-void rotate_pair(uint16_t angle_deg, int16_t &coordA, int16_t &coordB) {
+void rotate_pair(int16_t angle_deg, int16_t &coordA, int16_t &coordB) {
   // rotate 3d points in given 2-axis projection
   int16_t cos_val = (int16_t) (cos(radians(angle_deg)) * FLOAT_FACTOR);
   int16_t sin_val = (int16_t) (sin(radians(angle_deg)) * FLOAT_FACTOR);
@@ -101,7 +106,7 @@ void rotate_pair(uint16_t angle_deg, int16_t &coordA, int16_t &coordB) {
 /**
  * rotate point around given axis by given degree
  */
-void rotate(uint16_t angle_deg, uint8_t axis0, coord_3d &point_coords) {
+void rotate(int16_t angle_deg, uint8_t axis0, coord_3d &point_coords) {
   if (axis0 == 0) {
     rotate_pair(angle_deg, point_coords.y, point_coords.z);
   } else if (axis0 == 1) {
@@ -139,7 +144,7 @@ void shape_calculate() {
     // rotate to current position
     rotate(angle_deg_0, 0, rotated_3d_point);
     rotate(angle_deg_1, 1, rotated_3d_point);
-    rotate(angle_deg_2, 2, rotated_3d_point);
+    // rotate(angle_deg_2, 2, rotated_3d_point);
 
     // calculate the points
 
