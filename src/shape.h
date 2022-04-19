@@ -4,7 +4,7 @@
 
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 
-#define SHAPE 2
+#define SHAPE 1
 
 #if SHAPE == 1
 
