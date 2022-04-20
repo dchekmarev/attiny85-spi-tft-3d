@@ -16,6 +16,18 @@ void data(uint8_t c) {
   transfer(c);
 }
 
+void refresh_rate_slow() {
+  command(0xb1); data(0x00); data(0x10);
+  // max possible values: command(0xb5); data(0x7f); data(0x7f); data(0x1f); data(0x1f);
+  command(0xb5); data(0x4f); data(0x7f); data(0x0a); data(0x14);
+}
+
+void refresh_rate_normal() {
+  command(0xb5); data(0x02); data(0x02); data(0x0a); data(0x14);
+  // default: command(0xb1); data(0x00); data(0x1b);
+  command(0xb1); data(0x00); data(0x10);
+}
+
 void setAddrAndRW_cont(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
   command(ILI9341_CASET); // Column addr set
   data(x1 >> 8);

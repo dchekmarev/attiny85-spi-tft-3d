@@ -148,7 +148,9 @@ uint16_t count = 0;
 void fillScreenLoop() {
 
   c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
+  refresh_rate_slow();
   fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
+  refresh_rate_normal();
 }
 
 uint16_t framesTillColorChange = 0;
@@ -206,6 +208,8 @@ void shapeLoop() {
 
   shape_calculate();
 
+  refresh_rate_slow();
+  _delay_ms(2); // wait till scanline runs out of screen
   color = 0;
   shape_render(old_points);
 
@@ -217,6 +221,7 @@ void shapeLoop() {
 
   color = colors[c];
   shape_render(points);
+  refresh_rate_normal();
 }
 
 void loop() {
