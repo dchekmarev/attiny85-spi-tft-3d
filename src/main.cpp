@@ -130,7 +130,7 @@ void setup() {
 #define BOX_HEIGHT 64
 
 uint16_t x = 0, y = 0;
-int8_t dx = 5, dy = 3;
+int8_t dx = 3, dy = 3;
 uint8_t c = 0;
 
 static const uint16_t colors[] = {
@@ -242,7 +242,7 @@ void loop() {
   totalTimeSum += millis() - loopStart;
   count++;
 
-  if (totalTimeSum > 5000 || count > 500) { // print stats every ~5000ms
+  if (totalTimeSum > 5000 || count > 300) { // print stats every ~5000ms or 300 frames
     uint32_t millisPerCycle = totalTimeSum / count;
     Serial.print(millis());
     Serial.print(F("] cycle millis: "));
@@ -252,8 +252,7 @@ void loop() {
     Serial.flush();
     count = totalTimeSum = 0;
   }
-#else
-  _delay_ms(1);
 #endif
+  _delay_ms(1);
 
 }
