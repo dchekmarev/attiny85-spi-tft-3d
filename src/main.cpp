@@ -230,7 +230,7 @@ void loop() {
   }
 
   refresh_rate_slow();
-  _delay_ms(2); // wait till scanline runs out of screen
+  _delay_ms(1); // wait till scanline runs out of screen
 
   shapeLoop();
   // fillScreenLoop();
@@ -253,7 +253,7 @@ void loop() {
     count = totalTimeSum = 0;
   }
 #else
-  _delay_ms(10);
+  _delay_ms(1);
 #endif
 
 }
