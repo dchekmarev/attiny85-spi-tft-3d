@@ -57,8 +57,8 @@ void shape_init() {
     int16_t yc = (int16_t) (sin(radians(o * 360 / N_CIRCLES)) * FLOAT_FACTOR);
     for (uint8_t i = 0; i < N_C_POINTS; i++) {
       coord_3d p {
-         (int16_t) (sin(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR / 4),
-         (int16_t) (cos(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR / 4),
+         (int16_t) (sin(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR / 3),
+         (int16_t) (cos(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR / 3),
          0
       };
       rotate(90, 0, p);
@@ -73,7 +73,7 @@ void shape_init() {
 void shape_render(uint16_t points[][2]) {
   for (uint8_t o = 0; o < N_CIRCLES; o++) {
     for (uint8_t i = 0; i < N_C_POINTS; i++) {
-      connectPoints(o * N_C_POINTS + i, o*N_C_POINTS + (i + 1) % N_C_POINTS, points);
+      connectPoints(o * N_C_POINTS + i, o * N_C_POINTS + (i + 1) % N_C_POINTS, points);
     }
   }
   for (uint8_t i = 0; i < N_C_POINTS; i++) {
@@ -123,9 +123,7 @@ void shape_update() {
   angle_deg_1 = (angle_deg_1 + 5) % 360;
   angle_deg_2 = (angle_deg_2 + 7) % 360;
 
-#if DEBUG_ENABLED == 1
-  angle_deg_0 = angle_deg_1 = angle_deg_2 = 0;
-#endif
+  // angle_deg_0 = angle_deg_1 = angle_deg_2 = 0;
 }
 
 // TODO replace with 3 integers - probably will be placed inside registers
@@ -133,7 +131,8 @@ coord_3d rotated_3d_point;  // eight 3D points - rotated around Y axis
 
 void shape_calculate() {
   shape_update();
-  int16_t cube_size = (CUBE_SIZE * 2 / 3) + sin(time_frame * 0.05) * (CUBE_SIZE / 8);
+  int16_t cube_size = (CUBE_SIZE * 4 / 5) + sin(time_frame * 0.05) * (CUBE_SIZE / 8);
+  // cube_size = CUBE_SIZE * 3 / 2;
 
   // init points
   for (uint8_t i = 0; i < NPOINTS; ++i) {
