@@ -126,8 +126,8 @@ void setup() {
 #endif
 }
 
-#define BOX_WIDTH 128
-#define BOX_HEIGHT 128
+#define BOX_WIDTH 64
+#define BOX_HEIGHT 64
 
 uint16_t x = 0, y = 0;
 int8_t dx = 5, dy = 3;
@@ -146,21 +146,18 @@ uint32_t totalTimeSum = 0;
 uint16_t count = 0;
 
 void fillScreenLoop() {
-
   c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
-  refresh_rate_slow();
   fillRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
-  refresh_rate_normal();
 }
 
 uint16_t framesTillColorChange = 0;
 
 void floatingBoxLoop() {
 
-  if ( (x + dx < 0) || (x + dx > SCREEN_WIDTH - BOX_WIDTH) ) {
+  if ( (x + dx < 1) || (x + dx > SCREEN_WIDTH - BOX_WIDTH) ) {
     dx = -dx;
   }
-  if ( (y + dy < 0) || (y + dy > SCREEN_HEIGHT- BOX_HEIGHT) ) {
+  if ( (y + dy < 1) || (y + dy > SCREEN_HEIGHT- BOX_HEIGHT) ) {
     dy = -dy;
   }
   clearRect(x, y, dx, BOX_HEIGHT);
@@ -178,20 +175,18 @@ void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
   drawLine(points[i][0] + x, points[i][1] + y, points[j][0] + x, points[j][1] + y);
 }
 
-uint16_t old_points[NPOINTS][2];
-void shapeLoop() {
-  if (0 == framesTillColorChange--) {
-    c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
-    framesTillColorChange = 20 * 5; // 20 fps * 5 seconds
-
-    drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, colors[c]);
+void boxAroundScreen(uint16_t color) {
+    drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color);
     // boxes at corners
     #define CORNER_BOX_SIZE 10
-    fillRect(0, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
-    fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
-    fillRect(0, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
-    fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, colors[c]);
-  }
+    fillRect(0, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, color);
+    fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, color);
+    fillRect(0, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, color);
+    fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, color);
+}
+
+uint16_t old_points[NPOINTS][2];
+void shapeLoop() {
 
 #if DEBUG_ENABLED == 1
   c = 1;
@@ -208,8 +203,6 @@ void shapeLoop() {
 
   shape_calculate();
 
-  refresh_rate_slow();
-  _delay_ms(2); // wait till scanline runs out of screen
   color = 0;
   shape_render(old_points);
 
@@ -218,10 +211,10 @@ void shapeLoop() {
 #if DEBUG_ENABLED == 1
   x = y = 0;
 #endif
+  // x = (SCREEN_WIDTH - CUBE_SIZE) / 2; y = (SCREEN_HEIGHT - CUBE_SIZE) / 2;
 
   color = colors[c];
   shape_render(points);
-  refresh_rate_normal();
 }
 
 void loop() {
@@ -230,9 +223,20 @@ void loop() {
   uint32_t loopStart = millis();
 #endif
 
+  if (0 == framesTillColorChange--) {
+    c = (c + 1) % (sizeof(colors) / sizeof(uint16_t));
+    framesTillColorChange = 20 * 5; // 20 fps * 5 seconds
+    boxAroundScreen(colors[c]);
+  }
+
+  refresh_rate_slow();
+  _delay_ms(2); // wait till scanline runs out of screen
+
   shapeLoop();
   // fillScreenLoop();
   // floatingBoxLoop();
+
+  refresh_rate_normal();
 
 #if SERIAL_ENABLED == 1
   totalTimeSum += millis() - loopStart;
