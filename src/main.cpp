@@ -145,7 +145,7 @@ void setup() {
 #define BOX_WIDTH 64
 #define BOX_HEIGHT 64
 
-uint16_t x = 0, y = 0;
+uint16_t x = 10, y = 10;
 int8_t dx = 3, dy = 3;
 uint8_t c = 0;
 
@@ -193,6 +193,7 @@ void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]) {
 
 void boxAroundScreen(uint16_t color) {
     drawRect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, color);
+    drawRect(1, 1, SCREEN_WIDTH - 2, SCREEN_HEIGHT - 2, color);
     // boxes at corners
     #define CORNER_BOX_SIZE 10
     fillRect(0, 0, CORNER_BOX_SIZE, CORNER_BOX_SIZE, color);
@@ -245,8 +246,9 @@ void loop() {
     boxAroundScreen(colors[c]);
   }
 
+  _delay_ms(3); // just in case there no enough time to display previous frame
   refresh_rate_slow();
-  _delay_ms(1); // wait till scanline runs out of screen
+  _delay_ms(3); // wait till scanline runs out of screen
 
   shapeLoop();
   // fillScreenLoop();
@@ -269,6 +271,5 @@ void loop() {
     count = totalTimeSum = 0;
   }
 #endif
-  _delay_ms(1);
 
 }
