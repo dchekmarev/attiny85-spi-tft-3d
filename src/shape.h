@@ -19,6 +19,7 @@
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 
 struct coord_3d { int16_t x; int16_t y; int16_t z; };
+struct coord_3d_8 { int8_t x; int8_t y; int8_t z; };
 
 #define SHAPE 2
 
@@ -28,7 +29,7 @@ struct coord_3d { int16_t x; int16_t y; int16_t z; };
 
 #define NPOINTS 8
 
-static int8_t orig_points[8][3] = {  // eight 3D points - set values for 3D cube
+static coord_3d_8 orig_points[8] = {  // eight 3D points - set values for 3D cube
     {-1, -1, 1},
     {1, -1, 1},
     {1, 1, 1},
@@ -40,9 +41,9 @@ static int8_t orig_points[8][3] = {  // eight 3D points - set values for 3D cube
 
 void shape_init() {
   for (uint8_t i = 0; i < NPOINTS; ++i) {
-    orig_points[i][0] *= FLOAT_FACTOR;
-    orig_points[i][1] *= FLOAT_FACTOR;
-    orig_points[i][2] *= FLOAT_FACTOR;
+    orig_points[i].x *= FLOAT_FACTOR;
+    orig_points[i].y *= FLOAT_FACTOR;
+    orig_points[i].z *= FLOAT_FACTOR;
   }
 }
 
@@ -61,7 +62,7 @@ void shape_render(uint16_t points[][2]) {
 #define N_C_POINTS 4
 
 #define NPOINTS (N_C_POINTS * N_CIRCLES)
-static int8_t orig_points[NPOINTS][3];
+static coord_3d_8 orig_points[NPOINTS];
 
 void rotate(int16_t angle_deg, uint8_t axis0, coord_3d &point_coords);
 
@@ -77,9 +78,9 @@ void shape_init() {
       };
       rotate(90, 0, p);
       rotate(o * 360 / N_CIRCLES, 2, p);
-      orig_points[o * N_C_POINTS + i][0] = xc + p.x;
-      orig_points[o * N_C_POINTS + i][1] = yc + p.y;
-      orig_points[o * N_C_POINTS + i][2] = p.z;
+      orig_points[o * N_C_POINTS + i].x = xc + p.x;
+      orig_points[o * N_C_POINTS + i].y = yc + p.y;
+      orig_points[o * N_C_POINTS + i].z = p.z;
     }
   }
 }
@@ -151,9 +152,9 @@ void shape_calculate() {
 
   // init points
   for (uint8_t i = 0; i < NPOINTS; ++i) {
-    rotated_3d_point.x = orig_points[i][0];
-    rotated_3d_point.y = orig_points[i][1];
-    rotated_3d_point.z = orig_points[i][2];
+    rotated_3d_point.x = orig_points[i].x;
+    rotated_3d_point.y = orig_points[i].y;
+    rotated_3d_point.z = orig_points[i].z;
 
     // rotate to current position
     rotate(angle_deg_0, 0, rotated_3d_point);
