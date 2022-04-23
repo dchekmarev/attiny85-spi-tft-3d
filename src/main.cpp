@@ -202,7 +202,6 @@ void boxAroundScreen(uint16_t color) {
     fillRect(SCREEN_WIDTH - CORNER_BOX_SIZE, SCREEN_HEIGHT - CORNER_BOX_SIZE, CORNER_BOX_SIZE, CORNER_BOX_SIZE, color);
 }
 
-uint16_t old_points[NPOINTS][2];
 void shapeLoop() {
 
 #if DEBUG_ENABLED == 1
@@ -216,12 +215,8 @@ void shapeLoop() {
     dy = -dy;
   }
 
-  memmove(old_points, points, sizeof(uint16_t) * NPOINTS * 2);
-
-  shape_calculate();
-
   color = 0;
-  shape_render(old_points);
+  shape_render(points);
 
   x += dx;
   y += dy;
@@ -229,6 +224,8 @@ void shapeLoop() {
   x = y = 0;
 #endif
   // x = (SCREEN_WIDTH - CUBE_SIZE) / 2; y = (SCREEN_HEIGHT - CUBE_SIZE) / 2;
+
+  shape_calculate();
 
   color = colors[c];
   shape_render(points);
