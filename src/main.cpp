@@ -216,7 +216,7 @@ void shapeLoop() {
   }
 
   color = 0;
-  shape_render(points);
+  shape_render();
 
   x += dx;
   y += dy;
@@ -228,7 +228,7 @@ void shapeLoop() {
   shape_calculate();
 
   color = colors[c];
-  shape_render(points);
+  shape_render();
 }
 
 void loop() {

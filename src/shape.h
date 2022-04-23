@@ -16,6 +16,8 @@
 #define rad_fact(x) (radians(x))
 #endif
 
+extern uint16_t points[][2]; // will be declared later
+
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 
 struct coord_3d { int16_t x; int16_t y; int16_t z; };
@@ -47,7 +49,7 @@ void shape_init() {
   }
 }
 
-void shape_render(uint16_t points[][2]) {
+void shape_render() {
   // connect the lines between the individual points
   for (uint8_t i = 0; i < 4; i++) {
     connectPoints(i, (i + 1) % 4, points);
@@ -85,7 +87,7 @@ void shape_init() {
   }
 }
 
-void shape_render(uint16_t points[][2]) {
+void shape_render() {
   for (uint8_t o = 0; o < N_CIRCLES; o++) {
     for (uint8_t i = 0; i < N_C_POINTS; i++) {
       connectPoints(o * N_C_POINTS + i, o * N_C_POINTS + (i + 1) % N_C_POINTS, points);
