@@ -2,6 +2,20 @@
 
 #define FLOAT_FACTOR 64 // instead of using floats, we ok to have precission of 1/64 & we know numbers*64 are within uint16_t
 
+#define FAST_MATH 1
+
+#if FAST_MATH == 1
+#include "math_fast_int.h"
+
+#define sin_fact sin_fast_int
+#define cos_fact cos_fast_int
+#define rad_fact radians_fast_int
+#else
+#define sin_fact(x) (sin(x) * FLOAT_FACTOR)
+#define cos_fact(x) (cos(x) * FLOAT_FACTOR)
+#define rad_fact(x) (radians(x))
+#endif
+
 void connectPoints(uint8_t i, uint8_t j, uint16_t points[][2]);
 
 struct coord_3d { int16_t x; int16_t y; int16_t z; };
@@ -53,12 +67,12 @@ void rotate(int16_t angle_deg, uint8_t axis0, coord_3d &point_coords);
 
 void shape_init() {
   for (uint8_t o = 0; o < N_CIRCLES; o++) {
-    int16_t xc = (int16_t) (cos(radians(o * 360 / N_CIRCLES)) * FLOAT_FACTOR);
-    int16_t yc = (int16_t) (sin(radians(o * 360 / N_CIRCLES)) * FLOAT_FACTOR);
+    int16_t xc = (int16_t) (cos_fact(rad_fact(o * 360 / N_CIRCLES)));
+    int16_t yc = (int16_t) (sin_fact(rad_fact(o * 360 / N_CIRCLES)));
     for (uint8_t i = 0; i < N_C_POINTS; i++) {
       coord_3d p {
-         (int16_t) (sin(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR / 3),
-         (int16_t) (cos(radians(i * 360 / N_C_POINTS)) * FLOAT_FACTOR / 3),
+         (int16_t) (sin_fact(rad_fact(i * 360 / N_C_POINTS)) / 3),
+         (int16_t) (cos_fact(rad_fact(i * 360 / N_C_POINTS)) / 3),
          0
       };
       rotate(90, 0, p);
@@ -95,8 +109,8 @@ uint16_t time_frame;        // ever increasing time value
 
 void rotate_pair(int16_t angle_deg, int16_t &coordA, int16_t &coordB) {
   // rotate 3d points in given 2-axis projection
-  int16_t cos_val = (int16_t) (cos(radians(angle_deg)) * FLOAT_FACTOR);
-  int16_t sin_val = (int16_t) (sin(radians(angle_deg)) * FLOAT_FACTOR);
+  int16_t cos_val = (int16_t) (cos_fact(rad_fact(angle_deg)));
+  int16_t sin_val = (int16_t) (sin_fact(rad_fact(angle_deg)));
 
   int16_t old_x = coordA;
   coordA = (coordA * cos_val - coordB * sin_val) / FLOAT_FACTOR;
@@ -131,7 +145,8 @@ coord_3d rotated_3d_point;  // eight 3D points - rotated around Y axis
 
 void shape_calculate() {
   shape_update();
-  int16_t cube_size = (CUBE_SIZE * 4 / 5) + sin(time_frame * 0.05) * (CUBE_SIZE / 8);
+  int16_t sin_val = (int16_t) (sin_fact(rad_fact(time_frame) * 4));
+  int16_t cube_size = (CUBE_SIZE * 4 / 5) + sin_val * (CUBE_SIZE / 8) / FLOAT_FACTOR;
   // cube_size = CUBE_SIZE * 3 / 2;
 
   // init points
